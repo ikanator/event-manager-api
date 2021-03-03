@@ -14,7 +14,12 @@ const port = process.env.PORT || 3000;
 
 app.set("trust proxy", 1);
 app.use(
-  cookieSession({ name: "session", keys: ["key1"], maxAge: 24 * 60 * 60 * 365 })
+  cookieSession({
+    name: "session",
+    keys: ["key1"],
+    maxAge: 24 * 60 * 60 * 365,
+    sameSite: false,
+  })
 );
 
 // parse cookies
