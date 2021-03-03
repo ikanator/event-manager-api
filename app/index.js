@@ -18,8 +18,11 @@ app.use(
     name: "session",
     keys: ["key1"],
     maxAge: 24 * 60 * 60 * 365,
+    saveUninitialized: true,
+    resave: true,
     sameSite: false,
-    httpOnly: false,
+    httpOnly: true,
+    secure: true,
   })
 );
 
@@ -28,13 +31,14 @@ app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
-// app.use(
-//   cors({
-//     origin: "https://enigmatic-temple-94500.herokuapp.com",
-//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: "https://enigmatic-temple-94500.herokuapp.com",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+    allowedHeaders: "Access-Control-Allow-Credentials, Content-Type, Accept",
+  })
+);
 app.use(json());
 
 app.use("/auth", userRouter);
