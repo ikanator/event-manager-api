@@ -34,7 +34,7 @@ userRouter.post("/create", async (req, res) => {
     const user = new User({ email: username, firstName, lastName });
     await user.setPassword(password);
     await user.save();
-    res.send({ user });
+    res.send({ user, success: true });
   } catch (error) {
     console.log("this is an error", error);
     res.status(400).send({ error });
