@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel app --out-dir dist",
     "dev": "nodemon --exec babel-node app/index.js",
-    "start": "node app/index.js"
+    "start": "babel-node app/index.js"
   },
   "repository": {
     "type": "git",
