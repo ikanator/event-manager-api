@@ -18,6 +18,9 @@ app.use(
     name: "session",
     keys: ["key1"],
     maxAge: 24 * 60 * 60 * 365,
+    secure: true,
+    httpOnly: true,
+    sameSite: "none",
   })
 );
 
