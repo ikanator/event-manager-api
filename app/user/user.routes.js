@@ -48,7 +48,7 @@ userRouter.get(
   }),
   (req, res) => {
     req.session.user = req.user;
-    res.redirect("http://localhost:3006");
+    res.redirect("https://enigmatic-temple-94500.herokuapp.com");
   }
 );
 

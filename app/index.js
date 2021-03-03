@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(
   cors({
-    origin: "http://localhost:3006",
+    origin: "https://enigmatic-temple-94500.herokuapp.com/",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
