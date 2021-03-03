@@ -48,4 +48,4 @@ passport.use(
   )
 );
 
-passport.use(User.createStrategy());
+// passport.use(User.create);

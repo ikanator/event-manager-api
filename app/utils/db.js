@@ -3,10 +3,13 @@ import mongoose from "mongoose";
 export const connect = async () => {
   const db = mongoose.connection;
 
-  mongoose.connect("mongodb://localhost:27017/garaj_db", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  mongoose.connect(
+    "mongodb+srv://ikatsadze:Mniiiavc97@cluster0.0ikrr.mongodb.net/event-manager",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  );
 
   db.on("error", console.error.bind(console, "connection error:"));
   await db.once("open", () => {

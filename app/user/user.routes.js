@@ -19,25 +19,26 @@ userRouter.get("/facebook/success", (req, res) => {
 });
 
 userRouter.get("/facebook", passport.authenticate("facebook"));
-userRouter.post("/local", passport.authenticate("local"), (req, res) => {
-  req.session.user = req.user;
 
-  res.send({ user: req.user, success: true });
+userRouter.post("/local", async (req, res) => {
+  const { email, password } = req.body;
+  const { user } = await User.authenticate()(email, password);
+  req.session.user = user;
+  res.send({ user, success: true });
 });
 
 userRouter.post("/create", async (req, res) => {
   const { username, firstName, lastName, password } = req.body;
 
   try {
-    const user = await User.register(
-      new User({ email: username, firstName, lastName }),
-      password
-    );
+    const user = new User({ email: username, firstName, lastName });
+    await user.setPassword(password);
+    await user.save();
+    res.send({ user });
   } catch (error) {
     console.log("this is an error", error);
+    res.status(400).send({ error });
   }
-
-  res.send({ user });
 });
 
 userRouter.get(
