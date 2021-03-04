@@ -1,30 +1,20 @@
 import express from "express";
 import passport from "passport";
 import User from "./user.model";
+import jwt from "jsonwebtoken";
 import UserController from "./user.controller";
 
 const userRouter = express.Router();
-
-userRouter.get("/facebook/success", (req, res) => {
-  if (req.session.user) {
-    res.json({
-      success: true,
-      message: "user has successfully authenticated",
-      user: req.session.user,
-      cookies: req.cookies,
-    });
-  } else {
-    return res.status(401).send({ message: "error message" });
-  }
-});
 
 userRouter.get("/facebook", passport.authenticate("facebook"));
 
 userRouter.post("/local", async (req, res) => {
   const { email, password } = req.body;
   const { user } = await User.authenticate()(email, password);
-  req.session.user = user;
-  res.send({ user, success: true });
+  const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
+    expiresIn: 24 * 60 * 60 * 365,
+  });
+  res.send({ userId: user._id, tokenId: token });
 });
 
 userRouter.post("/create", async (req, res) => {
@@ -47,8 +37,12 @@ userRouter.get(
     failureRedirect: "/auth/fail",
   }),
   (req, res) => {
-    req.session.user = req.user;
-    res.redirect("https://enigmatic-temple-94500.herokuapp.com");
+    const token = jwt.sign({ id: req.user._id }, process.env.TOKEN_SECRET, {
+      expiresIn: 24 * 60 * 60 * 365,
+    });
+    res.redirect(
+      `${process.env.ORIGIN}/authenticated?userId=${req.user._id}&tokenId=${token}`
+    );
   }
 );
 

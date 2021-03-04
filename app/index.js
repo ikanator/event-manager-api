@@ -2,8 +2,6 @@ import express from "express";
 import { json } from "body-parser";
 import passport from "passport";
 import cors from "cors";
-import cookieSession from "cookie-session";
-import cookieParser from "cookie-parser";
 
 import { connect } from "./utils/db";
 import userRouter from "./user/user.routes";
@@ -12,26 +10,11 @@ import eventRouter from "./event/event.routes";
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.set("trust proxy", 1);
-app.use(
-  cookieSession({
-    name: "session",
-    keys: ["key1"],
-    maxAge: 24 * 60 * 60 * 365,
-    secure: true,
-    httpOnly: true,
-    sameSite: "none",
-  })
-);
-
-// parse cookies
-app.use(cookieParser());
-
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(
   cors({
-    origin: "https://enigmatic-temple-94500.herokuapp.com",
+    origin: process.env.ORIGIN,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })

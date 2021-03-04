@@ -11,13 +11,13 @@ eventRouter.get("/", async (req, res) => {
 
 eventRouter.post("/:id/removeMe", async (req, res) => {
   const { id: eventId } = req.params;
-  const { _id: participantId } = req.session.user;
+  const { userId } = req.body;
   const event = await Event.findOne({ _id: eventId });
 
   await Event.updateOne(
     { _id: eventId },
     {
-      participantIds: event.participantIds.filter((id) => participantId !== id),
+      participantIds: event.participantIds.filter((id) => userId !== id),
     }
   );
   const events = await Event.find({}).populate("participants");
@@ -26,10 +26,10 @@ eventRouter.post("/:id/removeMe", async (req, res) => {
 
 eventRouter.post("/:id/addMe", async (req, res) => {
   const { id: eventId } = req.params;
-  const { _id: participantId } = req.session.user;
+  const { userId } = req.body;
 
   const event = await Event.findOne({ _id: eventId });
-  const newParticipants = [...event.participantIds, participantId];
+  const newParticipants = [...event.participantIds, userId];
 
   await Event.updateOne({ _id: eventId }, { participantIds: newParticipants });
   const events = await Event.find({}).populate("participants");
