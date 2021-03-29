@@ -18,10 +18,10 @@ userRouter.post("/local", async (req, res) => {
 });
 
 userRouter.post("/create", async (req, res) => {
-  const { username, firstName, lastName, password } = req.body;
+  const { email, firstName, lastName, password } = req.body;
 
   try {
-    const user = new User({ email: username, firstName, lastName });
+    const user = new User({ email, firstName, lastName });
     await user.setPassword(password);
     await user.save();
     res.send({ user, success: true });
