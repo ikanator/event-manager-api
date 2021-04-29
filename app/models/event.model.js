@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import User from "../user/user.model";
 
 const EventSchema = new Schema(
   {
@@ -23,12 +22,12 @@ const EventSchema = new Schema(
   }
 );
 
-EventSchema.virtual("participants", {
-  ref: "User",
-  localField: "participantIds",
-  foreignField: "_id",
-  justOne: false,
-});
+// EventSchema.virtual("participants", {
+//   ref: "User",
+//   localField: "participantIds",
+//   foreignField: "_id",
+//   justOne: false,
+// });
 const Event = mongoose.model("Event", EventSchema);
 
 export default Event;

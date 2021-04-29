@@ -7,7 +7,9 @@ export const connect = async () => {
     "mongodb+srv://ikatsadze:Mniiiavc97@cluster0.0ikrr.mongodb.net/event-manager",
     {
       useNewUrlParser: true,
+      useCreateIndex: true,
       useUnifiedTopology: true,
+      useFindAndModify: false,
     }
   );
 

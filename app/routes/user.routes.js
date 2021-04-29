@@ -1,14 +1,18 @@
+import express from "express";
 import passport from "passport";
-import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 import facebook from "passport-facebook";
-import local from "passport-local";
 
-import User from "../user/user.model";
+import User from "../models/user.model";
+
+import {
+  FACEBOOK_CLIENT_ID,
+  FACEBOOK_CLIENT_SECRET,
+  FACEBOOK_CALLBACK_URL,
+} from "../constants";
 
 const FacebookStrategy = facebook.Strategy;
-const LocalStrategy = local.Strategy;
 
-dotenv.config();
 passport.serializeUser((user, done) => {
   done(null, user._id);
 });
@@ -19,9 +23,9 @@ passport.deserializeUser((id, done) => {
 passport.use(
   new FacebookStrategy(
     {
-      clientID: process.env.FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+      clientID: FACEBOOK_CLIENT_ID,
+      clientSecret: FACEBOOK_CLIENT_SECRET,
+      callbackURL: FACEBOOK_CALLBACK_URL,
       profileFields: ["id", "name"],
     },
     async function (accessToken, refreshToken, profile, done) {
@@ -48,4 +52,21 @@ passport.use(
   )
 );
 
-// passport.use(User.create);
+const userRouter = express.Router();
+
+userRouter.get("/facebook", passport.authenticate("facebook"));
+
+userRouter.get(
+  "/facebook/callback",
+  passport.authenticate("facebook", {
+    failureRedirect: `${process.env.ORIGIN}/login`,
+  }),
+  (req, res) => {
+    const token = jwt.sign({ id: req.user._id }, process.env.TOKEN_SECRET, {
+      expiresIn: 24 * 60 * 60 * 365,
+    });
+    res.redirect(`${process.env.ORIGIN}/login?token=${token}`);
+  }
+);
+
+export default userRouter;

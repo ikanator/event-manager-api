@@ -1,41 +1,55 @@
+import { ApolloServer } from "apollo-server-express";
 import express from "express";
-import { json } from "body-parser";
+import jwt from "jsonwebtoken";
 import passport from "passport";
-import cors from "cors";
+import dotenv from "dotenv";
 
-import { connect } from "./utils/db";
-import userRouter from "./user/user.routes";
-import eventRouter from "./event/event.routes";
+import { connect } from "./config/db";
+import typeDefs from "./graphql/types";
+import resolvers from "./graphql/resolvers";
+import userRouter from "./routes/user.routes";
+import { TOKEN_SECRET } from "./constants";
+
+connect();
+dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-app.use(express.urlencoded({ extended: true }));
+// Use passport to log in with Facebook
 app.use(passport.initialize());
-app.use(
-  cors({
-    origin: process.env.ORIGIN,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-  })
-);
-app.use(json());
-
+// Facebook auth route
 app.use("/auth", userRouter);
-app.use("/events", eventRouter);
 
-const authCheck = (req, res, next) => {
-  if (!req.user) {
-    res.status(401).json({
-      authenticated: false,
-      message: "user has not been authenticated",
-    });
-  } else {
-    next();
-  }
-};
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => {
+    let userId = null;
 
-app.listen(port, async () => {
-  await connect();
-  console.log(`Server listening on ${port}`);
+    // Get the user token from the headers.
+    const authHeader = req?.headers?.authorization || "Bearer ";
+    const token = authHeader.replace("Bearer ", "");
+
+    if (token) {
+      // Try to retrieve a user id with the token
+      const { id } = jwt.verify(token, TOKEN_SECRET);
+
+      if (id) {
+        userId = id;
+      }
+    }
+
+    const context = {
+      // Add userId to context
+      userId,
+    };
+
+    return context;
+  },
+});
+
+server.applyMiddleware({ app });
+
+app.listen({ port: 3000 }, () => {
+  console.log(`🚀  Server ready at ${server.graphqlPath}`);
 });
